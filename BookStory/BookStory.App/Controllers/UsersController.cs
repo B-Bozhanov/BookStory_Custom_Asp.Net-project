@@ -1,18 +1,22 @@
-﻿using HttpServer.Http;
-using HttpServer.Http.HttpResponses;
-
-using MvcFramework;
-
-namespace BookStory.App.Controllers
+﻿namespace BookStory.App.Controllers
 {
+    using HttpServer.Http.HttpResponses;
+
+    using MvcFramework;
+
     public class UsersController : Controller
     {
-        public HttpResponse Login(HttpRequest request)
+        public HttpResponse Login()
         {
             return this.View();
         }
 
-        public HttpResponse Register(HttpRequest request)
+        public HttpResponse DoLogin()
+        {
+            return this.View("Hello from DoLogin");
+        }
+
+        public HttpResponse Register()
         {
             return this.View();
         }

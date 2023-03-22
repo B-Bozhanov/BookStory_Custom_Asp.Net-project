@@ -1,7 +1,8 @@
 ﻿namespace HttpServer.Common
 {
-    internal static class HttpExceptions
+    public static class HttpExceptions
     {
-        internal const string UnsupportedMethod = "The method is not supported!";
+        public const string UnsupportedMethod = "The method is not supported!";
+        public const string FileNotExist = "File does not exist!";
     }
 }

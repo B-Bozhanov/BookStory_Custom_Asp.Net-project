@@ -3,60 +3,63 @@
     using System.Runtime.CompilerServices;
     using System.Text;
 
+    using HttpServer.Common;
+    using HttpServer.Http;
     using HttpServer.Http.HttpResponses;
 
     public abstract class Controller
     {
+        public HttpRequest Request { get; set; }
+
         public HttpResponse View([CallerMemberName] string fileName = null!)
         {
-            var views = "Views/";
+            var (contentType, fileBytes) = this.GetPathBytes("Views/", fileName);
 
-            var controllerName = this.GetType().Name.Replace("Controller", string.Empty) + '/';
-
-            var path = views + controllerName;
-
-            // This will not catch file with the same names and differents extencions.
-            var filePath = Directory.GetFiles(path)
-               .Where(f => new FileInfo(f).Name == fileName + new FileInfo(f).Extension)
-               .FirstOrDefault();
-
-            if (filePath == null)
-            {
-                throw new ArgumentException("File path does not exist!");
-            }
-
-           // var layout = System.IO.File.ReadAllText("Views/layout.cshtml");
-
-            var result = System.IO.File.ReadAllText(filePath);
-
-            //layout = layout.Replace("{{RenderBody}}", result);
-
-            var viewBytes = Encoding.UTF8.GetBytes(result);
-
-            return new HttpResponse("text/html", viewBytes);
+            return new HttpResponse(contentType, fileBytes);
         }
 
-        public static HttpResponse File(string contenType, [CallerMemberName] string fileName = null!) 
+        public HttpResponse File(string contenType, [CallerMemberName] string fileName = null!)
         {
-            var rootPath = "wwwroot/";
-            var test = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
-            var filePath = Directory.GetFiles(rootPath)
-                .Where(f => new FileInfo(f).Name == fileName.ToLower() + new FileInfo(f).Extension)
-                .FirstOrDefault();
+            var (contentType, fileBytes) = this.GetPathBytes("wwwroot/", fileName);
 
-            if (filePath == null)
-            {
-                throw new ArgumentException("File does not exist!");
-            }
-
-            var result = System.IO.File.ReadAllBytes(filePath);
-
-            return new HttpResponse(contenType, result);
+            return new HttpResponse(contenType, fileBytes);
         }
 
         public HttpResponse Redirect(string url)
         {
             return HttpResponse.Redirect(url);
+        }
+
+        private (string contentType, byte[] fileBytes) GetPathBytes(string folderName, string fileName)
+        {
+            var controllerName = this.GetType().Name.Replace("Controller", string.Empty) + '/';
+
+            var path = folderName + controllerName;
+
+            var filesPath = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+
+            byte[] fileBytes = null!;
+
+            var contentType = string.Empty;
+
+            foreach (var filePath in filesPath)
+            {
+                var file = new FileInfo(filePath);
+
+                if (file.Name == fileName + file.Extension)
+                {
+                    var fileText = System.IO.File.ReadAllText(filePath);
+                    fileBytes = Encoding.UTF8.GetBytes(fileText);
+                    contentType = HttpConstants.ContentType.GetContentType(file.Extension);
+                }
+            }
+
+            if (fileBytes == null)
+            {
+                throw new ArgumentException(HttpExceptions.FileNotExist);
+            }
+
+            return (contentType, fileBytes);
         }
     }
 }

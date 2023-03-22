@@ -6,17 +6,17 @@
 
     public class Route
     {
-        public Route(string url, HttpMethod method, Func<HttpRequest, HttpResponse> action)
+        public Route(string url, HttpMethod method, Func<HttpRequest, HttpResponse> action )
         {
             this.Url = url;
-            this.Method = method;
+            this.HttpMethod = method;
             this.Action = action;
         }
 
-        public string Url { get; }
+        public string Url { get; set; }
 
-        public HttpMethod Method { get; }
+        public HttpMethod HttpMethod { get; set; }
 
-        public Func<HttpRequest, HttpResponse> Action { get; }
+        public Func<HttpRequest, HttpResponse> Action { get; set; }
     }
 }

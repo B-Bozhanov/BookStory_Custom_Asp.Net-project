@@ -11,6 +11,7 @@
                 {
                     {".txt", "text/plane" },
                     {".html", "text/html" },
+                    {".cshtml", "text/html" },
                     {".js", "text/javascript" },
                     {".css", "text/css" },
                     {".ico", "image/vnd.microsoft.icon" },

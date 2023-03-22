@@ -1,75 +1,7 @@
-﻿using System.Reflection;
-
-using BookStory.App.Controllers;
-
-using HttpServer;
-using HttpServer.Common;
-using HttpServer.Http.HttpResponses;
+﻿using BookStory.App;
 
 using MvcFramework;
 
-//TODO: Move ipAddress and por from here:
-var ipAddress = "127.0.0.1";
-var port = 80;
-
-IHttpServer server = new Server(ipAddress, port);
-
-server.RouteStaticFiles();
-//server.RoutePaths();
-
-//AutoRouteStaticFiles(server);
-
-AutoRoutePaths(server);
-
-await server.Start();
-
-static void AutoRoutePaths(IHttpServer server)
-{
-    var controllers = Assembly.GetCallingAssembly()
-        .GetTypes()
-        .Where(t => t.IsClass && t.IsSubclassOf(typeof(Controller))
-                              && !t.IsAbstract && t.IsPublic);
-
-    foreach (var controller in controllers)
-    {
-        var controllerName = controller.Name.Replace(nameof(Controller), string.Empty);
-        var methods = controller
-            .GetMethods()
-            .Where(m => !m.IsConstructor && !m.IsSpecialName && m.DeclaringType == controller);
-
-        var controllerInstance = Activator.CreateInstance(controller) as Controller;
-
-        foreach (var method in methods)
-        {
-            var parameters = method.GetParameters().Length;
+await Host.CreateHostAsync(new StartUp());
 
 
-            var path = $"/{controllerName}/{method.Name}";
-
-            server.AddRoute(path, (request) =>
-            {
-                var response = method.Invoke(controllerInstance, new object[parameters]) as HttpResponse;
-
-                return response;
-            });
-        }
-    }
-}
-static void AutoRouteStaticFiles(IHttpServer server)
-{
-    var staticFilesPaths = Directory.GetFiles("wwwroot/", "*", SearchOption.AllDirectories);
-
-    foreach (var staticFilesPath in staticFilesPaths)
-    {
-        var filePath = staticFilesPath.Replace("wwwroot", string.Empty).Replace("\\", "/");
-
-        server.AddRoute(filePath, (request) =>
-        {
-            var fileExtencion = new FileInfo(staticFilesPath);
-
-            var contentType = HttpConstants.ContentType.GetContentType(fileExtencion.Extension);
-
-            return new HttpResponse(contentType, File.ReadAllBytes("wwwroot" + filePath));
-        });
-    }
-}

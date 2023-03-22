@@ -1,38 +1,38 @@
 ﻿namespace BookStory.App.Controllers
 {
-    using HttpServer.Http;
     using HttpServer.Http.HttpResponses;
 
     using MvcFramework;
 
     public class HomeController : Controller
     {
-        public HttpResponse Index(HttpRequest request)
+        [HttpGet("/")]
+        public HttpResponse Index()
         {
             return this.View();
         }
 
-        public HttpResponse Search(HttpRequest request)
+        public HttpResponse Search()
         {
             return this.View();
         }
 
-        public HttpResponse MyProfile(HttpRequest request)
+        public HttpResponse MyProfile()
         {
             return this.Redirect("/Users/Login");
         }
 
-        public HttpResponse About(HttpRequest request)
+        public HttpResponse About()
         {
             return this.View();
         }
 
-        public HttpResponse Help(HttpRequest request)
+        public HttpResponse Help()
         {
             return this.View();
         }
 
-        public HttpResponse Contacts(HttpRequest request)
+        public HttpResponse Contacts()
         {
             return this.View();
         }

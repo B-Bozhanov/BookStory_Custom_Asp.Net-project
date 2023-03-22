@@ -1,9 +1,11 @@
 ﻿namespace MvcFramework
 {
+    using HttpServer;
+
     public interface IMvcApplication
     {
-        public void Configurate();
+        public void ConfigurateServices();
 
-        public void ConfigurateRoutes();
+        public void Configurate(IDictionary<string, Route> routeTable);
     }
 }
