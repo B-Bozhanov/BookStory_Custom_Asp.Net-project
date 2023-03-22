@@ -34,10 +34,8 @@ static void AutoRoutePaths(IHttpServer server)
     {
         var controllerName = controller.Name.Replace(nameof(Controller), string.Empty);
         var methods = controller
-            .GetMethods(BindingFlags.DeclaredOnly |
-                        BindingFlags.Public |
-                        BindingFlags.Instance)
-            .Where(m => !m.IsConstructor && !m.IsSpecialName);
+            .GetMethods()
+            .Where(m => !m.IsConstructor && !m.IsSpecialName && m.DeclaringType == controller);
 
         var controllerInstance = Activator.CreateInstance(controller) as Controller;
 
@@ -45,16 +43,8 @@ static void AutoRoutePaths(IHttpServer server)
         {
             var parameters = method.GetParameters().Length;
 
-            var path = string.Empty;
 
-            if (method.Name == nameof(HomeController.Index))
-            {
-                path = "/";
-            }
-            else
-            {
-                path = $"/{controllerName}/{method.Name}";
-            }
+            var path = $"/{controllerName}/{method.Name}";
 
             server.AddRoute(path, (request) =>
             {
