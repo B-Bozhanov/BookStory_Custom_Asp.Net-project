@@ -1,5 +1,6 @@
 ﻿namespace MvcFramework
 {
+    using System.Reflection.Metadata;
     using System.Runtime.CompilerServices;
     using System.Text;
 
@@ -35,8 +36,18 @@
             var controllerName = this.GetType().Name.Replace("Controller", string.Empty) + '/';
 
             var path = folderName + controllerName;
-
+                      
             var filesPath = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+
+            var layoutPath = string.Empty;
+            var layoutText = string.Empty;
+
+            if (folderName == "Views/")
+            {
+                layoutPath = folderName + "Layout.cshtml";
+                layoutText = System.IO.File.ReadAllText(layoutPath);
+            }
+
 
             byte[] fileBytes = null!;
 
@@ -49,8 +60,16 @@
                 if (file.Name == fileName + file.Extension)
                 {
                     var fileText = System.IO.File.ReadAllText(filePath);
+
+                    if (!string.IsNullOrEmpty(layoutPath))
+                    {
+                        layoutText = layoutText.Replace("[[RenderBody]]", fileText);
+                        fileBytes = Encoding.UTF8.GetBytes(layoutText);
+                        break;
+                    }
                     fileBytes = Encoding.UTF8.GetBytes(fileText);
                     contentType = HttpConstants.ContentType.GetContentType(file.Extension);
+                    break;
                 }
             }
 
